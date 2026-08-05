@@ -6,21 +6,20 @@
 
 from django.http import HttpResponse
 from django.template import loader
-
+from django.shortcuts import render
 
 def index(request):
     template = loader.get_template("home/index.html")
     
     
     students = [
-        {"name": "Jane Doe", "matriculation": "123456"},
-        {"name": "John Smith", "matriculation": "654321"},
-        {"name": "Alex Johnson", "matriculation": "789012"},
+        {"name": "Merve Sarısoy", "matriculation": "674397"},
     ]
     
     projects = [
-        {"name": "Home", "url_name": "home:index"},
-        {"name": "Home 2", "url_name": "home:index"},
+      {"name": "Project 1", "url_name": "project1:index"},
+      {"name": "Project 2", "url_name": "project2:index"},
+      {"name": "Project 3", "url_name": "project3:index"},
     ]
     
     context = { 
@@ -28,4 +27,4 @@ def index(request):
         "projects": projects, 
     }
     
-    return HttpResponse(template.render(context, request))
+    return render(request, 'home/index.html', context)

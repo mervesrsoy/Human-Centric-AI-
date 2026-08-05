@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCAI - Project 1</title>
+    <style>
+        /* Renk Paleti ve Temel Ayarlar */
+        :root {
+            --primary-lilac: #B39DDB;      /* Ana butonlar ve vurgular */
+            --dark-lilac: #9575CD;         /* Başlıklar ve hover durumları */
+            --light-lilac: #EDE7F6;        /* Arka plan vurguları */
+            --bg-color: #F8F6FA;           /* Sayfa arka planı */
+            --text-color: #4A4A4A;         /* Genel metin rengi */
+            --border-color: #D1C4E9;       /* Kenarlıklar */
+            --success-bg: #E8F5E9;         /* Başarılı sonuç arka planı */
+            --success-text: #2E7D32;       /* Başarılı sonuç metni */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; 
+            padding: 40px 20px; 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 850px; 
+            margin: auto; 
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(149, 117, 205, 0.1);
+        }
+
+        h1, h2, h3 { 
+            color: var(--dark-lilac); 
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--light-lilac);
+            padding-bottom: 15px;
+        }
+
+        /* Form Tasarımı */
+        .form-container {
+            background-color: var(--light-lilac); 
+            padding: 25px 30px; 
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--dark-lilac);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            color: var(--text-color);
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--dark-lilac);
+            box-shadow: 0 0 0 3px rgba(179, 157, 219, 0.3);
+        }
+
+        button[type="submit"] {
+            background-color: var(--primary-lilac);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--dark-lilac);
+        }
+
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+
+        /* Sonuç Kartları */
+        .result-card {
+            background-color: var(--success-bg); 
+            color: var(--success-text); 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px;
+            border-left: 5px solid #66BB6A;
+        }
+
+        .result-card p {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .error-message {
+            background-color: #FFEBEE;
+            color: #C62828;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 5px solid #EF5350;
+            margin-bottom: 20px;
+        }
+
+        /* Tablo Tasarımı */
+        .data-table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th, .data-table td { 
+            border: 1px solid #E0E0E0; 
+            padding: 12px 15px; 
+            text-align: left; 
+        }
+        
+        .data-table th { 
+            background-color: var(--primary-lilac); 
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #FAFAFA;
+        }
+
+        .data-table tr:hover {
+            background-color: var(--light-lilac);
+        }
+
+        /* Grafik Konteyneri */
+        .plot-container { 
+            text-align: center; 
+            margin-top: 40px; 
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .plot-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Supervised Learning Interface</h1>
+        
+        <div class="form-container">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>1. Upload a CSV Dataset:</label>
+                    <input type="file" name="csv_file" accept=".csv" required>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Select ML Model:</label>
+                    <select name="model_type">
+                        <option value="knn">K-Nearest Neighbors (KNN)</option>
+                        <option value="tree">Decision Tree</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Test Data Size (e.g., 0.2 for 20%):</label>
+                    <input type="number" name="test_size" step="0.05" min="0.1" max="0.5" value="0.2" required>
+                </div>
+
+                <button type="submit">Train Model & Visualize</button>
+            </form>
+        </div>
+
+        {% if error %}
+            <div class="error-message">
+                <b>Hata:</b> {{ error }}
+            </div>
+        {% endif %}
+
+        {% if accuracy %}
+            <div class="result-card">
+                <h3 style="margin-top: 0; color: var(--success-text);">Machine Learning Results</h3>
+                <p><b>Selected Model:</b> {{ selected_model }}</p>
+                <p><b>Test Data Size:</b> {{ test_size }}</p>
+                <p><b>Model Accuracy (Score):</b> %{{ accuracy }}</p>
+            </div>
+        {% endif %}
+
+        {% if data_html %}
+            <h2>Dataset Preview (First 5 Rows)</h2>
+            <div style="overflow-x: auto;">
+                {{ data_html|safe }}
+            </div>
+        {% endif %}
+
+        {% if plot_uri %}
+            <div class="plot-container">
+                <h2>Feature 1 vs Feature 2 (Scatter Plot)</h2>
+                <img src="{{ plot_uri }}" alt="Data Plot">
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

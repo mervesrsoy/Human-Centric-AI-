@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HCAI - Project 2: Explainability</title>
+    <style>
+        :root {
+            --primary: #a288e3;       
+            --primary-hover: #8860d0; 
+            --bg-color: #f7f5fa;      
+            --card-bg: #ffffff;
+            --text-main: #3a3042;     
+            --text-muted: #80758a;
+            --border-color: #dcd6e8;  
+            --success-bg: #f0ebf7;    
+            --success-text: #3a3042;
+            --success-border: #dcd6e8;
+            --warning-bg: #fdfaf5;    
+            --warning-border: #eee7d6;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            scroll-behavior: smooth; /* Tüm sayfaya yumuşak kaydırma özelliği eklendi */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(162, 136, 227, 0.08); 
+        }
+
+        h1 { font-size: 2.2rem; font-weight: 800; margin-top: 0; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; color: var(--text-main); }
+        h2 { font-size: 1.5rem; color: var(--text-main); margin-top: 50px; margin-bottom: 20px; border-left: 4px solid var(--primary); padding-left: 12px; scroll-margin-top: 20px; }
+        h3 { font-size: 1.25rem; color: var(--text-main); margin-bottom: 15px; margin-top: 0; }
+
+        .panel {
+            background-color: #faf9fc;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .panel.warning { background-color: var(--warning-bg); border-color: var(--warning-border); }
+        .panel.success { background-color: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+
+        .controls-group { margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        label { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+        
+        select, input[type="number"] {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+            background-color: #fff;
+            color: var(--text-main);
+        }
+        select:focus, input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(162, 136, 227, 0.2); }
+
+        input[type="range"] { width: 100%; max-width: 350px; cursor: pointer; accent-color: var(--primary); }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(162, 136, 227, 0.2);
+        }
+        button:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(136, 96, 208, 0.3); }
+
+        .metrics-grid { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .metric-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--primary); }
+        .metric-card span { display: block; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; font-weight: 600;}
+        .metric-card strong { font-size: 1.8rem; color: var(--text-main); }
+
+        .plot-container { text-align: center; margin-top: 20px; background: white; border: 1px solid var(--border-color); padding: 20px; border-radius: 12px;}
+        .plot-container img { max-width: 100%; height: auto; border-radius: 8px; }
+
+        .flex-container { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px; }
+        .flex-child { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center;}
+        .flex-child img { width: 100%; border-radius: 8px; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); margin-top: 15px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--bg-color); font-weight: 600; color: var(--text-main); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #faf9fc; }
+
+        .help-text { font-size: 0.85rem; color: var(--text-muted); font-style: italic; display: block; margin-top: 8px;}
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 50px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Project 2: Explainable AI (XAI)</h1>
+        
+        <h2 id="task1">1. Model Training & Regularization</h2>
+        <div class="panel warning">
+            <form method="post">
+                {% csrf_token %}
+                <div class="controls-group">
+                    <label>Select Algorithm:</label>
+                    <select name="model_type">
+                        <option value="tree" {% if model_type == 'tree' %}selected{% endif %}>Decision Tree</option>
+                        <option value="logistic" {% if model_type == 'logistic' %}selected{% endif %}>Logistic Regression (L1)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="lambda_slider">Complexity Penalty (&lambda;): <span style="color: var(--primary-hover); font-size: 1.1rem; font-weight: bold;" id="lambda_display">{{ lambda_val }}</span></label><br>
+                    <input type="range" id="lambda_slider" name="lambda_val" min="0" max="0.1" step="0.001" value="{{ lambda_val }}" oninput="document.getElementById('lambda_display').innerText = this.value">
+                </div>
+                
+                <button type="submit">Apply & Train Model</button>
+            </form>
+            <span class="help-text">Increase the penalty to force the model to become simpler and more interpretable.</span>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span>Active Model</span>
+                <strong>{% if model_type == 'tree' %}Decision Tree{% else %}Logistic Reg.{% endif %}</strong>
+            </div>
+            <div class="metric-card">
+                <span>Test Accuracy</span>
+                <strong>%{{ accuracy }}</strong>
+            </div>
+            <div class="metric-card">
+                <span>{{ complexity_label }}</span>
+                <strong>{{ complexity_val }}</strong>
+            </div>
+        </div>
+
+        <div class="plot-container">
+            <h3>Model Architecture Visualization</h3>
+            <img src="{{ model_plot }}" alt="Model Visualization Plot">
+        </div>
+
+        <hr>
+
+        <h2 id="task4">2. Counterfactual Explanations</h2>
+        <div class="panel">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="model_type" value="{{ model_type }}">
+                <input type="hidden" name="lambda_val" value="{{ lambda_val }}">
+                
+                <div class="controls-group">
+                    <div>
+                        <label>Test Subject ID (0-60):</label><br>
+                        <input type="number" name="cf_index" min="0" max="60" value="{{ cf_index|default:0 }}" required>
+                    </div>
+                    <div>
+                        <label>Desired Target Species:</label><br>
+                        <select name="cf_target">
+                            <option value="Adelie" {% if cf_target == 'Adelie' %}selected{% endif %}>Adelie</option>
+                            <option value="Gentoo" {% if cf_target == 'Gentoo' %}selected{% endif %}>Gentoo</option>
+                            <option value="Chinstrap" {% if cf_target == 'Chinstrap' %}selected{% endif %}>Chinstrap</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" name="run_cf" value="1">Generate "What-If" Scenario</button>
+            </form>
+            <span class="help-text">Find out the minimum physical changes required for a penguin to be classified as a different species.</span>
+        </div>
+
+        {% if cf_requested %}
+            <div class="panel success">
+                <h3>Simulation Results</h3>
+                <p><b>Original Classification:</b> {{ orig_pred }}</p>
+                <p><b>Target Classification:</b> {{ cf_target }}</p>
+                
+                {% if cf_found %}
+                    <p style="margin-top: 15px;"><i>Required feature modifications to change the model's prediction:</i></p>
+                    <table>
+                        <tr>
+                            <th>Feature Name</th>
+                            <th>Original Value</th>
+                            <th>Required Value</th>
+                            <th>Necessary Change</th>
+                        </tr>
+                        {% for item in cf_comparison %}
+                        <tr>
+                            <td style="font-weight: 500;">{{ item.feature }}</td>
+                            <td>{{ item.orig|floatformat:2 }}</td>
+                            <td style="color: var(--primary-hover); font-weight: bold;">{{ item.cf|floatformat:2 }}</td>
+                            <td style="color: {% if item.diff > 0 %}#8860d0{% elif item.diff < 0 %}#e57373{% else %}#80758a{% endif %}; font-weight: bold;">
+                                {% if item.diff > 0 %}+{% endif %}{{ item.diff|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <div style="background: #fdf2f2; color: #b91c1c; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #fecaca;">
+                        <b>No Solution Found:</b> The simulation could not find a realistic counterfactual within the random search limits. Try a different Subject ID or Target.
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <h2 id="task5">3. Global Feature Effects</h2>
+        <div class="panel" style="background-color: #faf8fd; border-color: #dcd6e8;">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="model_type" value="{{ model_type }}">
+                <input type="hidden" name="lambda_val" value="{{ lambda_val }}">
+                
+                <div class="controls-group">
+                    <label>Select Numerical Feature to Analyze:</label>
+                    <select name="selected_feature">
+                        <option value="bill_length_mm" {% if selected_feature == 'bill_length_mm' %}selected{% endif %}>Bill Length (mm)</option>
+                        <option value="bill_depth_mm" {% if selected_feature == 'bill_depth_mm' %}selected{% endif %}>Bill Depth (mm)</option>
+                        <option value="flipper_length_mm" {% if selected_feature == 'flipper_length_mm' %}selected{% endif %}>Flipper Length (mm)</option>
+                        <option value="body_mass_g" {% if selected_feature == 'body_mass_g' %}selected{% endif %}>Body Mass (g)</option>
+                    </select>
+                </div>
+
+                <button type="submit" name="run_plots" value="1">Generate PDP & ALE Plots</button>
+            </form>
+            <span class="help-text">Visualize how changing a specific feature globally impacts the probability of each species.</span>
+        </div>
+
+        {% if pdp_plot and ale_plot %}
+            <div class="flex-container">
+                <div class="flex-child">
+                    <h3>Partial Dependence Plot (PDP)</h3>
+                    <img src="{{ pdp_plot }}" alt="PDP Plot">
+                </div>
+                <div class="flex-child">
+                    <h3>Accumulated Local Effects (ALE)</h3>
+                    <img src="{{ ale_plot }}" alt="ALE Plot">
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% if cf_requested %}
+                const task4 = document.getElementById('task4');
+                if(task4) task4.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            {% elif pdp_plot or ale_plot %}
+                const task5 = document.getElementById('task5');
+                if(task5) task5.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

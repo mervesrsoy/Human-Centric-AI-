@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCAI - Active Labeling</title>
+    <style>
+        :root {
+            --primary-lilac: #B39DDB;
+            --dark-lilac: #9575CD;
+            --light-lilac: #EDE7F6;
+            --bg-color: #F8F6FA;
+            --text-color: #4A4A4A;
+            --border-color: #D1C4E9;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; 
+            padding: 40px 20px; 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(149, 117, 205, 0.1);
+            text-align: center;
+        }
+
+        h2 { color: var(--dark-lilac); margin-bottom: 10px; }
+        
+        .status-badge {
+            display: inline-block;
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        .text-card {
+            background-color: #FAFAFA;
+            border: 1px solid #E0E0E0;
+            padding: 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: left;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn-label {
+            background-color: white;
+            color: var(--dark-lilac);
+            border: 2px solid var(--primary-lilac);
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-label:hover {
+            background-color: var(--primary-lilac);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(179, 157, 219, 0.4);
+        }
+
+        .btn-label:active { transform: translateY(0); }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #757575;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--dark-lilac); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Human Expert Interface</h2>
+        <div class="status-badge">Total Articles Labeled: {{ labeled_count }}</div>
+
+        <p>Please read the news article below and classify it into the correct category:</p>
+
+        <div class="text-card">
+            {{ text_to_label }}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-grid">
+                <button type="submit" name="label" value="0" class="btn-label">🌍 World</button>
+                <button type="submit" name="label" value="1" class="btn-label">⚽ Sports</button>
+                <button type="submit" name="label" value="2" class="btn-label">💼 Business</button>
+                <button type="submit" name="label" value="3" class="btn-label">💻 Sci/Tech</button>
+            </div>
+        </form>
+
+        <a href="{% url 'project3:index' %}" class="back-link">← Return to Dashboard</a>
+    </div>
+</body>
+</html>
